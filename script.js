@@ -10,7 +10,7 @@ const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 
 let snake = [{ x: 10, y: 10 }];
-let foods = []; 
+let foods = [];
 let dx = 0;
 let dy = 0;
 let score = 0;
@@ -26,27 +26,27 @@ let highScores = JSON.parse(localStorage.getItem("snakeHighScores")) || [
 let gameSpeed = parseInt(speedSelect.value);
 let wallMode = wallSelect.value;
 let gameTimeoutId = null;
-let intervals = []; 
+let intervals = [];
 let isGameOver = false;
 let audioCtx = null;
 
 updateLeaderboardUI();
 
 const FOOD_TYPES = {
-    BLUE:   { color: "#007BFF", score: 10,  growth: 1,  type: 'blue',  lifetime: 5000 },  
-    GOLD:   { color: "#FFD700", score: 50,  growth: 10, type: 'gold',  lifetime: 3000 },  
-    WHITE:  { color: "#FFFFFF", score: 25,  growth: 5,  type: 'white', lifetime: 3000 },  
-    RED:    { color: "#FF5252", score: -30, growth: -7, type: 'red',   lifetime: 5000 }   
+    BLUE: { color: "#007BFF", score: 10, growth: 1, type: 'blue', lifetime: 5000 },
+    GOLD: { color: "#FFD700", score: 50, growth: 10, type: 'gold', lifetime: 3000 },
+    WHITE: { color: "#FFFFFF", score: 25, growth: 5, type: 'white', lifetime: 3000 },
+    RED: { color: "#FF5252", score: -30, growth: -7, type: 'red', lifetime: 5000 }
 };
 
 speedSelect.addEventListener("change", () => { gameSpeed = parseInt(speedSelect.value); blurControls(); });
 wallSelect.addEventListener("change", () => { wallMode = wallSelect.value; blurControls(); });
 resetBtn.addEventListener("click", () => { initAudio(); resetGame(); blurControls(); });
 
-function blurControls() { 
-    speedSelect.blur(); 
-    wallSelect.blur(); 
-    resetBtn.blur(); 
+function blurControls() {
+    speedSelect.blur();
+    wallSelect.blur();
+    resetBtn.blur();
 }
 
 function initAudio() {
@@ -74,33 +74,33 @@ function playSound(frequency, type, duration, vol) {
 }
 
 const SOUNDS = {
-    blue:   () => playSound(523.25, 'triangle', 0.15, 0.3),
-    white:  () => { 
+    blue: () => playSound(523.25, 'triangle', 0.15, 0.3),
+    white: () => {
         playSound(587.33, 'triangle', 0.1, 0.3);
         setTimeout(() => playSound(698.46, 'triangle', 0.1, 0.3), 80);
     },
-    gold:   () => { 
+    gold: () => {
         playSound(523.25, 'sine', 0.1, 0.4);
         setTimeout(() => playSound(659.25, 'sine', 0.1, 0.4), 70);
         setTimeout(() => playSound(783.99, 'sine', 0.1, 0.4), 140);
         setTimeout(() => playSound(1046.50, 'sine', 0.2, 0.4), 210);
     },
-    red:    () => { 
+    red: () => {
         playSound(220, 'sawtooth', 0.3, 0.2);
         setTimeout(() => playSound(146.83, 'sawtooth', 0.2, 0.2), 100);
     },
-    cut:    () => { 
+    cut: () => {
         playSound(180, 'square', 0.15, 0.2);
         setTimeout(() => playSound(110, 'square', 0.15, 0.2), 70);
     },
-    fail:   () => { 
+    fail: () => {
         playSound(300, 'sawtooth', 0.2, 0.3);
         setTimeout(() => playSound(200, 'sawtooth', 0.2, 0.3), 150);
         setTimeout(() => playSound(130, 'sawtooth', 0.4, 0.4), 300);
     }
 };
 function startFoodSpawners() {
-    stopFoodSpawners(); 
+    stopFoodSpawners();
     intervals.push(setInterval(() => spawnTimedFood(FOOD_TYPES.GOLD), 15000));
     intervals.push(setInterval(() => spawnTimedFood(FOOD_TYPES.WHITE), 7500));
     intervals.push(setInterval(() => spawnTimedFood(FOOD_TYPES.RED), 3750));
@@ -112,8 +112,8 @@ function stopFoodSpawners() {
 }
 
 function spawnTimedFood(foodType) {
-    if ((dx === 0 && dy === 0) || isGameOver) return; 
-    
+    if ((dx === 0 && dy === 0) || isGameOver) return;
+
     const exists = foods.some(f => f.config.type === foodType.type);
     if (exists) return;
 
@@ -129,7 +129,7 @@ function spawnTimedFood(foodType) {
 
 function checkAndSpawnBlueFood() {
     if (isGameOver || (dx === 0 && dy === 0)) return;
-    
+
     const blueFood = foods.find(f => f.config.type === 'blue');
     if (!blueFood) {
         spawnTimedFood(FOOD_TYPES.BLUE);
@@ -160,16 +160,16 @@ function main() {
             alert(`Игра окончена! Ваш счёт: ${score}`);
             checkHighScore(score);
         }, 50);
-        return; 
+        return;
     }
 
     clearTimeout(gameTimeoutId);
     gameTimeoutId = setTimeout(function onTick() {
         clearCanvas();
-        checkAndSpawnBlueFood(); 
+        checkAndSpawnBlueFood();
         drawFoods();
         moveSnake();
-        checkSelfIntersection(); 
+        checkSelfIntersection();
         drawSnake();
         main();
     }, gameSpeed);
@@ -177,7 +177,7 @@ function main() {
 
 function checkHighScore(currentScore) {
     const minHighScore = highScores[highScores.length - 1].score;
-    
+
     if (currentScore > minHighScore && currentScore > 0) {
         const name = prompt("Поздравляем! Вы попали в таблицу рекордов. Введите ваше имя:", "Игрок") || "Аноним";
         highScores.push({ name: name, score: currentScore });
@@ -246,7 +246,7 @@ function moveSnake() {
     if (eatenFoodIndex !== -1) {
         const eatenFood = foods[eatenFoodIndex];
         score += eatenFood.config.score;
-        if (score < 0) score = 0; 
+        if (score < 0) score = 0;
         scoreElement.innerText = "Счёт: " + score;
 
         if (SOUNDS[eatenFood.config.type]) SOUNDS[eatenFood.config.type]();
@@ -264,9 +264,9 @@ function moveSnake() {
         foods.splice(eatenFoodIndex, 1);
     } else {
         if (snake.growthQueue && snake.growthQueue > 0) {
-            snake.growthQueue--; 
+            snake.growthQueue--;
         } else {
-            if (snake.length > 0) snake.pop(); 
+            if (snake.length > 0) snake.pop();
         }
     }
 }
@@ -274,29 +274,29 @@ function moveSnake() {
 // Изменено: в классическом режиме врезание в хвост теперь завершает игру
 function checkSelfIntersection() {
     if (snake.length <= 1 || (dx === 0 && dy === 0)) return;
-    
+
     const head = snake[0];
-    
+
     for (let i = 1; i < snake.length; i++) {
         if (snake[i].x === head.x && snake[i].y === head.y) {
             if (wallMode === 'classic') {
                 // Если режим классический — принудительно обнуляем змейку, провоцируя проигрыш
-                snake = []; 
+                snake = [];
             } else {
                 // В остальных режимах — по-прежнему укорачиваем хвост
                 snake = snake.slice(0, i);
                 score = Math.max(0, score - 15);
                 scoreElement.innerText = "Счёт: " + score;
-                SOUNDS.cut(); 
+                SOUNDS.cut();
             }
-            break; 
+            break;
         }
     }
 }
 
 function hasGameEnded() {
     if (snake.length === 0) return true;
-    
+
     if (wallMode === 'classic') {
         const head = snake[0];
         const hitLeftWall = head.x < 0;
@@ -319,7 +319,7 @@ function resetGame() {
     score = 0;
     scoreElement.innerText = "Счёт: " + score;
     isGameOver = false;
-    main(); 
+    main();
 }
 
 function changeDirection(event) {
@@ -330,7 +330,7 @@ function changeDirection(event) {
     const goingRight = dx === 1; const goingLeft = dx === -1;
 
     if (dx === 0 && dy === 0 && [LEFT_KEY, UP_KEY, RIGHT_KEY, DOWN_KEY].includes(keyPressed)) {
-        initAudio(); 
+        initAudio();
         startFoodSpawners();
     }
 
@@ -342,3 +342,16 @@ function changeDirection(event) {
 
 document.addEventListener("keydown", changeDirection);
 main();
+
+// Добавление кнопки очистки рекордов под таблицу
+const clearBtn = document.createElement("button");
+clearBtn.innerText = "Сбросить таблицу";
+clearBtn.style.cssText = "width:100%; margin-top:15px; background:#555; color:white; border:none; padding:5px; cursor:pointer; border-radius:4px;";
+clearBtn.onclick = () => {
+    if (confirm("Вы уверены, что хотите удалить все рекорды?")) {
+        localStorage.removeItem("snakeHighScores");
+        location.reload(); // Перезагрузит страницу для обновления Топ-5
+    }
+};
+document.querySelector(".leaderboard").appendChild(clearBtn);
+
