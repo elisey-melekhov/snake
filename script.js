@@ -33,10 +33,10 @@ let audioCtx = null;
 updateLeaderboardUI();
 
 const FOOD_TYPES = {
-    BLUE:   { color: "#007BFF", score: 10,  growth: 1,  type: 'blue' },
-    GOLD:   { color: "#FFD700", score: 50,  growth: 10, type: 'gold' },
-    WHITE:  { color: "#FFFFFF", score: 25,  growth: 5,  type: 'white' },
-    RED:    { color: "#FF5252", score: -30, growth: -7, type: 'red' }
+    BLUE:   { color: "#007BFF", score: 10,  growth: 1,  type: 'blue',  lifetime: 5000 },  
+    GOLD:   { color: "#FFD700", score: 50,  growth: 10, type: 'gold',  lifetime: 3000 },  
+    WHITE:  { color: "#FFFFFF", score: 25,  growth: 5,  type: 'white', lifetime: 3000 },  
+    RED:    { color: "#FF5252", score: -30, growth: -7, type: 'red',   lifetime: 5000 }   
 };
 
 speedSelect.addEventListener("change", () => { gameSpeed = parseInt(speedSelect.value); blurControls(); });
@@ -113,6 +113,10 @@ function stopFoodSpawners() {
 
 function spawnTimedFood(foodType) {
     if ((dx === 0 && dy === 0) || isGameOver) return; 
+    
+    const exists = foods.some(f => f.config.type === foodType.type);
+    if (exists) return;
+
     const newFood = generateFoodCoords();
     newFood.config = foodType;
     foods.push(newFood);
@@ -120,17 +124,16 @@ function spawnTimedFood(foodType) {
     setTimeout(() => {
         const index = foods.indexOf(newFood);
         if (index > -1) foods.splice(index, 1);
-    }, 15000);
+    }, foodType.lifetime);
 }
 
-function spawnBlueFood() {
-    if (isGameOver) return;
+function checkAndSpawnBlueFood() {
+    if (isGameOver || (dx === 0 && dy === 0)) return;
+    
     const blueFood = foods.find(f => f.config.type === 'blue');
-    if (blueFood) return; 
-
-    const newFood = generateFoodCoords();
-    newFood.config = FOOD_TYPES.BLUE;
-    foods.push(newFood);
+    if (!blueFood) {
+        spawnTimedFood(FOOD_TYPES.BLUE);
+    }
 }
 
 function generateFoodCoords() {
@@ -163,7 +166,7 @@ function main() {
     clearTimeout(gameTimeoutId);
     gameTimeoutId = setTimeout(function onTick() {
         clearCanvas();
-        spawnBlueFood();
+        checkAndSpawnBlueFood(); 
         drawFoods();
         moveSnake();
         checkSelfIntersection(); 
@@ -268,15 +271,24 @@ function moveSnake() {
     }
 }
 
+// Изменено: в классическом режиме врезание в хвост теперь завершает игру
 function checkSelfIntersection() {
     if (snake.length <= 1 || (dx === 0 && dy === 0)) return;
+    
     const head = snake[0];
+    
     for (let i = 1; i < snake.length; i++) {
         if (snake[i].x === head.x && snake[i].y === head.y) {
-            snake = snake.slice(0, i);
-            score = Math.max(0, score - 15);
-            scoreElement.innerText = "Счёт: " + score;
-            SOUNDS.cut(); 
+            if (wallMode === 'classic') {
+                // Если режим классический — принудительно обнуляем змейку, провоцируя проигрыш
+                snake = []; 
+            } else {
+                // В остальных режимах — по-прежнему укорачиваем хвост
+                snake = snake.slice(0, i);
+                score = Math.max(0, score - 15);
+                scoreElement.innerText = "Счёт: " + score;
+                SOUNDS.cut(); 
+            }
             break; 
         }
     }
@@ -284,6 +296,7 @@ function checkSelfIntersection() {
 
 function hasGameEnded() {
     if (snake.length === 0) return true;
+    
     if (wallMode === 'classic') {
         const head = snake[0];
         const hitLeftWall = head.x < 0;
