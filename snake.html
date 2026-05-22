@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru" />
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Игра Змейка</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <h1>Игра «Змейка»</h1>
+
+    <div class="main-container">
+        <!-- Левая панель: настройки и игра -->
+        <div class="game-area">
+            <div class="scoreboard">
+                <div id="score">Счёт: 0</div>
+                <button id="resetBtn">Начать сначала</button>
+            </div>
+
+            <div class="controls">
+                <label>Скорость:
+                    <select id="speedSelect">
+                        <option value="150">Низкая</option>
+                        <option value="100" selected>Средняя</option>
+                        <option value="60">Высокая</option>
+                    </select>
+                </label>
+                <label>Режим стен:
+                    <select id="wallSelect">
+                        <option value="classic" selected>Классический (Смерть)</option>
+                        <option value="portal">Сквозь стену</option>
+                        <option value="random">Случайная стена</option>
+                    </select>
+                </label>
+            </div>
+
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Правая панель: Таблица рекордов -->
+        <div class="leaderboard">
+            <h2>Топ-5 игроков</h2>
+            <ol id="recordsList">
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
