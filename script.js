@@ -32,11 +32,23 @@ let audioCtx = null;
 
 updateLeaderboardUI();
 
+const bananaImage = new Image ();
+bananaImage.src = 'icon/banana.svg';
+
+const goldImage = new Image ();
+goldImage.src = 'icon/apple.svg'
+
+const whiteImage = new Image ();
+whiteImage.src = 'icon/seafood.svg'
+
+const redImage = new Image ();
+redImage.src = 'icon/amanita.svg'
+
 const FOOD_TYPES = {
-    BLUE: { color: "#007BFF", score: 10, growth: 1, type: 'blue', lifetime: 5000 },
-    GOLD: { color: "#FFD700", score: 50, growth: 10, type: 'gold', lifetime: 3000 },
-    WHITE: { color: "#FFFFFF", score: 25, growth: 5, type: 'white', lifetime: 3000 },
-    RED: { color: "#FF5252", score: -30, growth: -7, type: 'red', lifetime: 5000 }
+    BLUE: { color: "#007BFF", image: bananaImage, score: 10, growth: 1, type: 'blue', lifetime: 5000 },
+    GOLD: { color: "#FFD700", image: goldImage, score: 50, growth: 10, type: 'gold', lifetime: 3000 },
+    WHITE: { color: "#FFFFFF", image: whiteImage, score: 25, growth: 5, type: 'white', lifetime: 3000 },
+    RED: { color: "#FF5252", image: redImage, score: -30, growth: -7, type: 'red', lifetime: 5000 }
 };
 
 speedSelect.addEventListener("change", () => { gameSpeed = parseInt(speedSelect.value); blurControls(); });
@@ -99,11 +111,12 @@ const SOUNDS = {
         setTimeout(() => playSound(130, 'sawtooth', 0.4, 0.4), 300);
     }
 };
+
 function startFoodSpawners() {
     stopFoodSpawners();
     intervals.push(setInterval(() => spawnTimedFood(FOOD_TYPES.GOLD), 15000));
     intervals.push(setInterval(() => spawnTimedFood(FOOD_TYPES.WHITE), 7500));
-    intervals.push(setInterval(() => spawnTimedFood(FOOD_TYPES.RED), 3750));
+    intervals.push(setInterval(() => spawnTimedFood(FOOD_TYPES.RED), 1000));
 }
 
 function stopFoodSpawners() {
@@ -209,10 +222,23 @@ function drawSnake() {
     });
 }
 
+// Изменено: теперь функция проверяет, есть ли у еды иконка, и рисует картинку вместо квадрата
 function drawFoods() {
     foods.forEach(food => {
-        ctx.fillStyle = food.config.color;
-        ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+        if (food.config.image && food.config.image.complete) {
+            // Если картинка загружена, рисуем SVG-иконку банана на игровом поле
+            ctx.drawImage(
+                food.config.image, 
+                food.x * gridSize, 
+                food.y * gridSize, 
+                gridSize - 2, 
+                gridSize - 2
+            );
+        } else {
+            // Для остальных типов еды рисуем привычные цветные квадраты
+            ctx.fillStyle = food.config.color;
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+        }
     });
 }
 
@@ -322,36 +348,44 @@ function resetGame() {
     main();
 }
 
+// Логика поворота, вынесенная отдельно для клавиатуры и тача
+function handleDirectionChange(targetDx, targetDy) {
+    if (dx === 0 && dy === 0) {
+        initAudio();
+        startFoodSpawners();
+    }
+    dx = targetDx;
+    dy = targetDy;
+}
+
 function changeDirection(event) {
     if (isGameOver) return;
     const keyPressed = event.keyCode;
     const LEFT_KEY = 37; const UP_KEY = 38; const RIGHT_KEY = 39; const DOWN_KEY = 40;
-    const goingUp = dy === -1; const goingDown = dy === 1;
-    const goingRight = dx === 1; const goingLeft = dx === -1;
 
-    if (dx === 0 && dy === 0 && [LEFT_KEY, UP_KEY, RIGHT_KEY, DOWN_KEY].includes(keyPressed)) {
-        initAudio();
-        startFoodSpawners();
-    }
-
-    if (keyPressed === LEFT_KEY && !goingRight) { dx = -1; dy = 0; }
-    if (keyPressed === UP_KEY && !goingDown) { dx = 0; dy = -1; }
-    if (keyPressed === RIGHT_KEY && !goingLeft) { dx = 1; dy = 0; }
-    if (keyPressed === DOWN_KEY && !goingUp) { dx = 0; dy = 1; }
+    if (keyPressed === LEFT_KEY && dx !== 1) handleDirectionChange(-1, 0);
+    if (keyPressed === UP_KEY && dy !== 1) handleDirectionChange(0, -1);
+    if (keyPressed === RIGHT_KEY && dx !== -1) handleDirectionChange(1, 0);
+    if (keyPressed === DOWN_KEY && dy !== -1) handleDirectionChange(0, 1);
 }
 
 document.addEventListener("keydown", changeDirection);
-main();
 
-// Добавление кнопки очистки рекордов под таблицу
+// Слушатели для экранного джойстика смартфона
+document.getElementById("btnUp").addEventListener("touchstart", (e) => { e.preventDefault(); if (dy !== 1) handleDirectionChange(0, -1); });
+document.getElementById("btnDown").addEventListener("touchstart", (e) => { e.preventDefault(); if (dy !== -1) handleDirectionChange(0, 1); });
+document.getElementById("btnLeft").addEventListener("touchstart", (e) => { e.preventDefault(); if (dx !== 1) handleDirectionChange(-1, 0); });
+document.getElementById("btnRight").addEventListener("touchstart", (e) => { e.preventDefault(); if (dx !== -1) handleDirectionChange(1, 0); });
+
 const clearBtn = document.createElement("button");
 clearBtn.innerText = "Сбросить таблицу";
 clearBtn.style.cssText = "width:100%; margin-top:15px; background:#555; color:white; border:none; padding:5px; cursor:pointer; border-radius:4px;";
 clearBtn.onclick = () => {
-    if (confirm("Вы уверены, что хотите удалить все рекорды?")) {
+    if(confirm("Вы уверены, что хотите удалить все рекорды?")) {
         localStorage.removeItem("snakeHighScores");
-        location.reload(); // Перезагрузит страницу для обновления Топ-5
+        location.reload();
     }
 };
 document.querySelector(".leaderboard").appendChild(clearBtn);
 
+main();
