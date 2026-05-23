@@ -35,21 +35,30 @@
                     </select>
                 </label>
             </div>
-
             <canvas id="gameCanvas" width="400" height="400"></canvas>
         </div>
 
-        <!-- Правая панель: Таблица рекордов -->
-        <div class="leaderboard">
-            <h2>Топ-5 игроков</h2>
-            <ol id="recordsList">
-                <li>Пусто — 0</li>
-                <li>Пусто — 0</li>
-                <li>Пусто — 0</li>
-                <li>Пусто — 0</li>
-                <li>Пусто — 0</li>
-            </ol>
+        <div id="mobileJoystick">
+            <div class="row"><button id="btnUp">▲</button></div>
+            <div class="row">
+                <button id="btnLeft">◀</button>
+                <div class="spacer"></div>
+                <button id="btnRight">▶</button>
+            </div>
+            <div class="row"><button id="btnDown">▼</button></div>
         </div>
+    </div>
+    <!-- Правая панель: Таблица рекордов -->
+    <div class="leaderboard">
+        <h2>Топ-5 игроков</h2>
+        <ol id="recordsList">
+            <li>Пусто — 0</li>
+            <li>Пусто — 0</li>
+            <li>Пусто — 0</li>
+            <li>Пусто — 0</li>
+            <li>Пусто — 0</li>
+        </ol>
+    </div>
     </div>
 
     <script src="script.js"></script>
