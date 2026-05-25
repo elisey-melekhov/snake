@@ -1,43 +1,59 @@
 <!DOCTYPE html>
-<html lang="ru" />
+<html lang="ru">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Игра Змейка</title>
+    <title>Игра Змейка PRO</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <h1>Игра «Змейка»</h1>
 
-    <div class="main-container">
-        <!-- Левая панель: настройки и игра -->
+    <!-- ГЛАВНОЕ МЕНЮ ИГРЫ -->
+    <div id="mainMenu" class="menu-container">
+        <h1>ЗМЕЙКА PRO</h1>
+
+        <div class="menu-options">
+            <label>Режим стен:
+                <select id="wallSelectMenu">
+                    <option value="classic" selected>Классический (Смерть)</option>
+                    <option value="portal">Сквозь стену</option>
+                    <option value="random">Случайная стена</option>
+                </select>
+            </label>
+            <label>Начальная скорость:
+                <select id="speedSelectMenu">
+                    <option value="200">Уровень 1 (Детский)</option>
+                    <option value="175">Уровень 2</option>
+                    <option value="150">Уровень 3</option>
+                    <option value="130">Уровень 4</option>
+                    <option value="110" selected>Уровень 5 (Средний)</option>
+                    <option value="95">Уровень 6</option>
+                    <option value="80">Уровень 7</option>
+                    <option value="70">Уровень 8</option>
+                    <option value="60">Уровень 9 (Хардкор)</option>
+                    <option value="50">Уровень 10 (Безумие)</option>
+                </select>
+            </label>
+        </div>
+
+        <button id="startGameBtn" class="btn primary-btn">Начать игру</button>
+        <button id="viewRecordsBtn" class="btn">Посмотреть рекорды</button>
+    </div>
+
+    <!-- ИГРОВОЙ ЭКРАН (Изначально скрыт) -->
+    <div id="gameScreen" class="main-container hidden">
         <div class="game-area">
             <div class="scoreboard">
                 <div id="score">Счёт: 0</div>
                 <button id="resetBtn">Начать сначала</button>
-            </div>
-
-            <div class="controls">
-                <label>Скорость:
-                    <select id="speedSelect">
-                        <option value="150">Низкая</option>
-                        <option value="100" selected>Средняя</option>
-                        <option value="60">Высокая</option>
-                    </select>
-                </label>
-                <label>Режим стен:
-                    <select id="wallSelect">
-                        <option value="classic" selected>Классический (Смерть)</option>
-                        <option value="portal">Сквозь стену</option>
-                        <option value="random">Случайная стена</option>
-                    </select>
-                </label>
+                <button id="exitToMenuBtn">В меню</button>
             </div>
             <canvas id="gameCanvas" width="400" height="400"></canvas>
         </div>
 
+        <!-- Виртуальный джойстик -->
         <div id="mobileJoystick">
             <div class="row"><button id="btnUp">▲</button></div>
             <div class="row">
@@ -48,18 +64,24 @@
             <div class="row"><button id="btnDown">▼</button></div>
         </div>
     </div>
-    <!-- Правая панель: Таблица рекордов -->
-    <div class="leaderboard">
-        <h2>Топ-5 игроков</h2>
-        <ol id="recordsList">
-            <li>Пусто — 0</li>
-            <li>Пусто — 0</li>
-            <li>Пусто — 0</li>
-            <li>Пусто — 0</li>
-            <li>Пусто — 0</li>
-        </ol>
-    </div>
+
+    <!-- ОКНО РЕКОРДОВ (Модальное) -->
+    <div id="recordsOverlay" class="overlay hidden">
+        <div class="leaderboard">
+            <h2>Топ-5 игроков</h2>
+            <ol id="recordsList">
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+                <li>Пусто — 0</li>
+            </ol>
+            <button id="clearRecordsBtn" class="btn danger-btn">Сбросить таблицу</button>
+            <button id="closeRecordsBtn" class="btn primary-btn">Назад в меню</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
 </body>
+
+</html>
